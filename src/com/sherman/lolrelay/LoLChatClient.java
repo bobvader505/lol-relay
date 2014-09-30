@@ -11,6 +11,7 @@ import com.github.theholywaffle.lolchatapi.listeners.FriendListener;
 import com.github.theholywaffle.lolchatapi.riotapi.RateLimit;
 import com.github.theholywaffle.lolchatapi.riotapi.RiotApiKey;
 import com.github.theholywaffle.lolchatapi.wrapper.Friend;
+import com.github.theholywaffle.lolchatapi.wrapper.FriendGroup;
 
 public class LoLChatClient {
 
@@ -32,6 +33,13 @@ public class LoLChatClient {
 				api.addFriendGroup("muted");
 			if(api.getFriendGroupByName("admin") == null)
 				api.addFriendGroup("admin");
+			
+			System.out.println(api.getName(true));
+			for(FriendGroup group : api.getFriendGroups()){
+				System.out.println("\t+"+group.getName());
+				for(Friend friend : group.getFriends())
+					System.out.println("\t\t-"+friend.getName());
+			}
 
 			api.addChatListener(new ChatListener(){
 				@Override
@@ -56,7 +64,7 @@ public class LoLChatClient {
 						friend.sendMessage("You have muted chat.  You will not recieve messages until you use -unmute.");
 						break;
 					case "-unmute":
-						api.getFriendGroupByName("General").addFriend(friend);
+						api.getFriendGroupByName("**Default").addFriend(friend);
 						friend.sendMessage("You have unmuted chat.");
 						break;
 					case "-kick":

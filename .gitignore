@@ -3,5 +3,6 @@ $ cat .gitignore
 .project
 .classpath
 .DS_Store
-/.setting
+/.settings
 $1.class
+config.xml

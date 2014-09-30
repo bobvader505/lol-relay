@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config>
+	<apikey>RIOT-API-KEY</apikey>
+	<username>HOST-USERNAME</username>
+	<password>HOST-PASSWORD</password>
+	<servers>
+		<server>
+			<username>ACCOUNT1</username>
+			<password>PASSWORD1</password>
+			<owner>OWNER1</owner>
+		</server>
+		<server>
+			<username>ACCOUNT2</username>
+			<password>PASSWORD2</password>
+			<owner>OWNER2</owner>
+		</server>
+	</servers>
+</config>
