@@ -65,6 +65,7 @@ public class LoLChatClient {
 						friend.sendMessage("-online: Get all online users");
 						friend.sendMessage("-mute: Mute this chat");
 						friend.sendMessage("-unmute: Unmute this chat");
+						friend.sendMessage("-invite [user]: Invite [user] to chat");
 						if(friend.getGroup().getName().equals("admin")){
 							friend.sendMessage("-kick [user]: Kick [user] from chat");
 							friend.sendMessage("-promote [user]: Promote [user] to admin");
@@ -96,6 +97,10 @@ public class LoLChatClient {
 							api.getFriendGroupByName("admin").addFriend(api.getFriendByName(message.substring(message.indexOf(" "))));
 							friend.sendMessage("User promoted to admin");
 						}
+						break;
+					case "-invite":
+						api.addFriendByName(message.substring(message.indexOf(" ")), api.getFriendGroupByName("**Default"));
+						LoLChatLogger.logNotice(friend.getName() + " invited " + message.substring(message.indexOf(" ")) + " to join " + api.getName(true));
 						break;
 					default:
 						for (final Friend f : api.getOnlineFriends()) {
