@@ -3,4 +3,5 @@ $ cat .gitignore
 .project
 .classpath
 .DS_Store
-/.settings
+/.setting
+$1.class
