@@ -8,6 +8,7 @@ import com.github.theholywaffle.lolchatapi.LolStatus.Queue;
 import com.github.theholywaffle.lolchatapi.LolStatus.Tier;
 import com.github.theholywaffle.lolchatapi.listeners.ChatListener;
 import com.github.theholywaffle.lolchatapi.listeners.FriendListener;
+import com.github.theholywaffle.lolchatapi.listeners.FriendRequestListener;
 import com.github.theholywaffle.lolchatapi.riotapi.RateLimit;
 import com.github.theholywaffle.lolchatapi.riotapi.RiotApiKey;
 import com.github.theholywaffle.lolchatapi.wrapper.Friend;
@@ -17,8 +18,19 @@ public class LoLChatClient {
 
 	public LoLChatClient(Friend host, String apikey, String username, String password) {
 		final LolChat api = new LolChat(ChatServer.NA,
-				FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey(apikey,
+				FriendRequestPolicy.MANUAL, new RiotApiKey(apikey,
 						RateLimit.DEFAULT));
+		api.setFriendRequestListener(new FriendRequestListener() {
+
+			public boolean onFriendRequest(String userId, String name) {
+				LoLChatLogger.logNotice(name + " has joined " + api.getName(true));
+				for (final Friend f : api.getOnlineFriends()) {
+					if(!f.getGroup().getName().equals("muted"))
+						f.sendMessage(name + " has joined the channel.");
+				}
+				return true; // Accept user
+			}
+		});
 		if (api.login(username, password)) {
 			LoLChatLogger.logNotice(api.getName(true) + " launched succesfully.");
 			final LolStatus newStatus = new LolStatus();
