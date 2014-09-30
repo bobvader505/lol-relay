@@ -1,0 +1,6 @@
+$ cat .gitignore
+
+.project
+.classpath
+.DS_Store
+/.settings
