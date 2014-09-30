@@ -20,8 +20,7 @@ public class LoLChatClient {
 				FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey("f12fadad-50f3-4d04-b46d-2a620d811320",
 						RateLimit.DEFAULT));
 		if (api.login(username, password)) {
-			if(host!=null)
-				host.sendMessage("Instance succesfully launched");
+			LoLChatLogger.logNotice(api.getName(true) + " launched succesfully.");
 			final LolStatus newStatus = new LolStatus();
 			newStatus.setLevel(1337);
 			newStatus.setRankedLeagueQueue(Queue.RANKED_SOLO_5x5);
@@ -33,12 +32,18 @@ public class LoLChatClient {
 				api.addFriendGroup("muted");
 			if(api.getFriendGroupByName("admin") == null)
 				api.addFriendGroup("admin");
-			
-			System.out.println(api.getName(true));
+			if(host!=null){
+				host.sendMessage("Instance succesfully launched");
+				Friend admin = api.getFriendByName(host.getName());
+				if(admin==null)
+					api.addFriendByName(host.getName(), api.getFriendGroupByName("admin"));
+				else
+					api.getFriendGroupByName("admin").addFriend(admin);
+			}
 			for(FriendGroup group : api.getFriendGroups()){
-				System.out.println("\t+"+group.getName());
+				LoLChatLogger.logDebug("\t+"+group.getName());
 				for(Friend friend : group.getFriends())
-					System.out.println("\t\t-"+friend.getName());
+					LoLChatLogger.logDebug("\t\t-"+friend.getName());
 			}
 
 			api.addChatListener(new ChatListener(){
@@ -93,6 +98,7 @@ public class LoLChatClient {
 		}else{
 			if(host!=null)
 				host.sendMessage("Instance failed to launch");
+			LoLChatLogger.logError(api.getName(true) + " launched succesfully.");
 		}
 	}
 

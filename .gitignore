@@ -4,6 +4,5 @@ $ cat .gitignore
 .classpath
 .DS_Store
 /.settings
-LoLChatServer$1.class
-LoLChatClient$1.class
+*$1.class
 config.xml

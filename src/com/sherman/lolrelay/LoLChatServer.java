@@ -1,7 +1,5 @@
 package com.sherman.lolrelay;
 import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -10,7 +8,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import com.github.theholywaffle.lolchatapi.ChatServer;
 import com.github.theholywaffle.lolchatapi.FriendRequestPolicy;
@@ -22,43 +19,54 @@ import com.github.theholywaffle.lolchatapi.riotapi.RiotApiKey;
 import com.github.theholywaffle.lolchatapi.wrapper.Friend;
 
 public class LoLChatServer {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParserConfigurationException {
 		try {
 			new LoLChatServer();
-		} catch (ParserConfigurationException | SAXException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			LoLChatLogger.logError(e.toString());
 		}
 	}
 	
-	public LoLChatServer() throws ParserConfigurationException, SAXException, IOException{
+	public LoLChatServer() throws Exception{
 		File xmlFile = new File("config.xml");
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(xmlFile);
-		
-		doc.getDocumentElement().normalize();
-		Element config = (Element) doc.getElementsByTagName("config").item(0);
-		
-		final LolChat api = new LolChat(ChatServer.NA,
-				FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey(config.getElementsByTagName("apikey").item(0).getTextContent(),
-						RateLimit.DEFAULT));
-		if (api.login(config.getElementsByTagName("username").item(0).getTextContent(), config.getElementsByTagName("password").item(0).getTextContent())) {
-			NodeList servers = doc.getElementsByTagName("server");
-			for(int i=0; i<servers.getLength(); i++)
-				new LoLChatClient(api.getFriendByName(((Element)servers.item(i)).getElementsByTagName("owner").item(0).getTextContent()), 
-						((Element)servers.item(i)).getElementsByTagName("username").item(0).getTextContent(), 
-						((Element)servers.item(i)).getElementsByTagName("password").item(0).getTextContent());
+		if(xmlFile.exists()){
+			LoLChatLogger.logNotice("Loading server data from config.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+	
+			LoLChatLogger.flags[LoLChatLogger.ERROR_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("error").item(0).getTextContent());
+			LoLChatLogger.flags[LoLChatLogger.WARNING_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("warning").item(0).getTextContent());
+			LoLChatLogger.flags[LoLChatLogger.DEBUG_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("debug").item(0).getTextContent());
+			LoLChatLogger.flags[LoLChatLogger.NOTICE_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("notice").item(0).getTextContent());
 			
-			api.addChatListener(new ChatListener(){
-				@Override
-				public void onMessage(Friend friend, String message) {
-					String[] command = message.split(" ");
-					if(command[0].equals("launch")){
-						new LoLChatClient(friend, command[1], command[2]);
+			doc.getDocumentElement().normalize();
+			Element config = (Element) doc.getElementsByTagName("config").item(0);
+			LoLChatLogger.logNotice("Launching server with api key: " + config.getElementsByTagName("apikey").item(0).getTextContent());
+			final LolChat api = new LolChat(ChatServer.NA,
+					FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey(config.getElementsByTagName("apikey").item(0).getTextContent(),
+							RateLimit.DEFAULT));
+			LoLChatLogger.logNotice("Logging into server with supplied credentials (" + config.getElementsByTagName("username").item(0).getTextContent() + ", " + config.getElementsByTagName("password").item(0).getTextContent() + ")");
+			if (api.login(config.getElementsByTagName("username").item(0).getTextContent(), config.getElementsByTagName("password").item(0).getTextContent())) {
+				LoLChatLogger.logNotice("Loading saved client configs");
+				NodeList servers = doc.getElementsByTagName("client");
+				for(int i=0; i<servers.getLength(); i++)
+					new LoLChatClient(api.getFriendByName(((Element)servers.item(i)).getElementsByTagName("owner").item(0).getTextContent()), 
+							((Element)servers.item(i)).getElementsByTagName("username").item(0).getTextContent(), 
+							((Element)servers.item(i)).getElementsByTagName("password").item(0).getTextContent());
+				
+				api.addChatListener(new ChatListener(){
+					@Override
+					public void onMessage(Friend friend, String message) {
+						String[] command = message.split(" ");
+						if(command[0].equals("launch")){
+							new LoLChatClient(friend, command[1], command[2]);
+						}
 					}
-				}
-			});
+				});
+			}
+		}else{
+			LoLChatLogger.logError("config.xml not found");
 		}
 	}
 }
