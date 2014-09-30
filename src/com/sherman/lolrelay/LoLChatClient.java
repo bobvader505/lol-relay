@@ -15,9 +15,9 @@ import com.github.theholywaffle.lolchatapi.wrapper.FriendGroup;
 
 public class LoLChatClient {
 
-	public LoLChatClient(Friend host, String username, String password) {
+	public LoLChatClient(Friend host, String apikey, String username, String password) {
 		final LolChat api = new LolChat(ChatServer.NA,
-				FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey("f12fadad-50f3-4d04-b46d-2a620d811320",
+				FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey(apikey,
 						RateLimit.DEFAULT));
 		if (api.login(username, password)) {
 			LoLChatLogger.logNotice(api.getName(true) + " launched succesfully.");
@@ -45,7 +45,6 @@ public class LoLChatClient {
 				for(Friend friend : group.getFriends())
 					LoLChatLogger.logDebug("\t\t-"+friend.getName());
 			}
-
 			api.addChatListener(new ChatListener(){
 				@Override
 				public void onMessage(Friend friend, String message) {
@@ -101,5 +100,4 @@ public class LoLChatClient {
 			LoLChatLogger.logError(api.getName(true) + " launched succesfully.");
 		}
 	}
-
 }

@@ -41,10 +41,12 @@ public class LoLChatServer {
 			LoLChatLogger.flags[LoLChatLogger.NOTICE_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("notice").item(0).getTextContent());
 			
 			doc.getDocumentElement().normalize();
+			
 			Element config = (Element) doc.getElementsByTagName("config").item(0);
-			LoLChatLogger.logNotice("Launching server with api key: " + config.getElementsByTagName("apikey").item(0).getTextContent());
+			final String apiKey = config.getElementsByTagName("apikey").item(0).getTextContent();
+			LoLChatLogger.logNotice("Launching server with api key: " + apiKey);
 			final LolChat api = new LolChat(ChatServer.NA,
-					FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey(config.getElementsByTagName("apikey").item(0).getTextContent(),
+					FriendRequestPolicy.ACCEPT_ALL, new RiotApiKey(apiKey,
 							RateLimit.DEFAULT));
 			LoLChatLogger.logNotice("Logging into server with supplied credentials (" + config.getElementsByTagName("username").item(0).getTextContent() + ", " + config.getElementsByTagName("password").item(0).getTextContent() + ")");
 			if (api.login(config.getElementsByTagName("username").item(0).getTextContent(), config.getElementsByTagName("password").item(0).getTextContent())) {
@@ -52,6 +54,7 @@ public class LoLChatServer {
 				NodeList servers = doc.getElementsByTagName("client");
 				for(int i=0; i<servers.getLength(); i++)
 					new LoLChatClient(api.getFriendByName(((Element)servers.item(i)).getElementsByTagName("owner").item(0).getTextContent()), 
+							apiKey,
 							((Element)servers.item(i)).getElementsByTagName("username").item(0).getTextContent(), 
 							((Element)servers.item(i)).getElementsByTagName("password").item(0).getTextContent());
 				
@@ -60,7 +63,7 @@ public class LoLChatServer {
 					public void onMessage(Friend friend, String message) {
 						String[] command = message.split(" ");
 						if(command[0].equals("launch")){
-							new LoLChatClient(friend, command[1], command[2]);
+							new LoLChatClient(friend, apiKey, command[1], command[2]);
 						}
 					}
 				});
