@@ -3,16 +3,22 @@
 	<apikey>RIOT-API-KEY</apikey>
 	<username>HOST-USERNAME</username>
 	<password>HOST-PASSWORD</password>
-	<servers>
-		<server>
+	<logging>
+		<error>true</error>
+		<warning>true</warning>
+		<debug>true</debug>
+		<notice>true</notice>
+	</logging>
+	<clients>
+		<client>
 			<username>ACCOUNT1</username>
 			<password>PASSWORD1</password>
 			<owner>OWNER1</owner>
-		</server>
-		<server>
+		</client>
+		<client>
 			<username>ACCOUNT2</username>
 			<password>PASSWORD2</password>
 			<owner>OWNER2</owner>
-		</server>
-	</servers>
+		</client>
+	</clients>
 </config>
