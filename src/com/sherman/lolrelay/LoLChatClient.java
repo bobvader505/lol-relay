@@ -66,6 +66,7 @@ public class LoLChatClient {
 						friend.sendMessage("-mute: Mute this chat");
 						friend.sendMessage("-unmute: Unmute this chat");
 						friend.sendMessage("-invite [user]: Invite [user] to chat");
+						friend.sendMessage("-roll: Roll a number 1-100");
 						if(friend.getGroup().getName().equals("admin")){
 							friend.sendMessage("-kick [user]: Kick [user] from chat");
 							friend.sendMessage("-promote [user]: Promote [user] to admin");
@@ -101,6 +102,13 @@ public class LoLChatClient {
 					case "-invite":
 						api.addFriendByName(message.substring(message.indexOf(" ")), api.getFriendGroupByName("**Default"));
 						LoLChatLogger.logNotice(friend.getName() + " invited " + message.substring(message.indexOf(" ")) + " to join " + api.getName(true));
+						break;
+					case "-roll":
+						int num = (int) (Math.random() * 100);
+						for (final Friend f : api.getOnlineFriends()) {
+							if(!f.getGroup().getName().equals("muted"))
+								f.sendMessage(friend.getName() + " rolls a " + num + " (1-100)");
+						}
 						break;
 					default:
 						for (final Friend f : api.getOnlineFriends()) {
