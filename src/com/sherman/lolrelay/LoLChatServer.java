@@ -33,7 +33,7 @@ public class LoLChatServer {
 			LoLChatLogger.logNotice("Loading server data from config.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(xmlFile);
+			final Document doc = dBuilder.parse(xmlFile);
 	
 			LoLChatLogger.flags[LoLChatLogger.ERROR_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("error").item(0).getTextContent());
 			LoLChatLogger.flags[LoLChatLogger.WARNING_FLAG] = Boolean.parseBoolean(((Element)doc.getElementsByTagName("logging").item(0)).getElementsByTagName("warning").item(0).getTextContent());
